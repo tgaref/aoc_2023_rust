@@ -1,0 +1,47 @@
+mod day1;
+mod day2;
+mod day3;
+mod day4;
+mod day5;
+
+use aoc_2023_rust as lib;
+use lib::Puzzle;
+
+use day1::Day1;
+use day2::Day2;
+use day3::Day3;
+use day4::Day4;
+use day5::Day5;
+
+enum Selector {
+    All,
+    Single(usize),
+}
+
+fn main() {
+    let mut args = std::env::args().skip(1);
+
+    let selection = if args.len() == 0 {
+        Selector::All
+    } else {
+        Selector::Single(args.next().unwrap().parse::<usize>().unwrap())
+    };
+
+    let mut day1 = Day1::new();
+    let mut day2 = Day2::new();
+    let mut day3 = Day3::new();
+    let mut day4 = Day4::new();
+    let mut day5 = Day5::new();
+
+    let mut days: Vec<&mut dyn Puzzle> =
+        vec![&mut day1, &mut day2, &mut day3, &mut day4, &mut day5];
+
+    match selection {
+        Selector::Single(n) => lib::print_day(2023, n, days[n - 1].run()),
+        Selector::All => {
+            days.into_iter()
+                .enumerate()
+                .for_each(|(n, day)| lib::print_day(2023, n + 1, day.run()));
+        }
+    }
+}
