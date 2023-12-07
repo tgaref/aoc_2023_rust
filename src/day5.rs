@@ -114,38 +114,33 @@ impl Puzzle for Day5 {
     }
 
     fn part1(&self) -> String {
-        let mut min_location: usize = 999999999999;
-        for seed in &self.input.seeds {
-            let mut value = *seed;
-            for m in &self.input.maps {
-                value = map_value(value, m);
-            }
-            min_location = min_location.min(value);
-        }
+        let min_location = self
+            .input
+            .seeds
+            .iter()
+            .map(|seed| self.input.maps.iter().fold(*seed, map_value))
+            .min()
+            .unwrap();
         format!("{:?}", min_location)
     }
 
     fn part2(&self) -> String {
         let mut ranges: HashSet<Range> = HashSet::new();
-        let s = &self.input.seeds;
-        for i in 0..(s.len() / 2) {
+        self.input.seeds.chunks(2).for_each(|pair| {
             ranges.insert(Range {
-                a: s[2 * i],
-                b: s[2 * i] + s[2 * i + 1] - 1,
+                a: pair[0],
+                b: pair[0] + pair[1] - 1,
             });
-        }
+        });
 
-        for map in &self.input.maps {
+        self.input.maps.iter().for_each(|map| {
             let mut new_ranges: HashSet<Range> = HashSet::new();
-            for range in &ranges {
-                new_ranges.extend(range.apply(map).iter());
-            }
+            ranges
+                .iter()
+                .for_each(|range| new_ranges.extend(range.apply(map).iter()));
             ranges = new_ranges;
-        }
-        let mut min_location = 99999999999999;
-        for range in &ranges {
-            min_location = min_location.min(range.a);
-        }
+        });
+        let min_location = ranges.iter().map(|range| range.a).min().unwrap();
 
         format!("{:?}", min_location)
     }
@@ -179,7 +174,7 @@ fn complete_range(map: &mut Map) {
     }
     let r = Range {
         a: edge,
-        b: 999999999999,
+        b: usize::MAX,
     };
     result.push((r, r));
     map.extend(result.iter());
