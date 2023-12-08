@@ -1,5 +1,4 @@
 use aoc_2023_rust::Puzzle;
-extern crate integer_sqrt;
 
 #[derive(Debug, Clone)]
 pub struct Day6 {
