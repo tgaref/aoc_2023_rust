@@ -1,6 +1,6 @@
 use num::Integer;
 use num_bigint::BigUint;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 
