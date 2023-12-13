@@ -1,6 +1,5 @@
 use aoc_2023_rust::Puzzle;
 use std::collections::HashSet;
-use std::ops::Range;
 
 #[derive(Debug, Clone)]
 pub struct Day11 {
