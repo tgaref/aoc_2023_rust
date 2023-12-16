@@ -1,3 +1,5 @@
+use core::fmt;
+use std::fmt::{Debug, Display};
 use std::iter::{DoubleEndedIterator, ExactSizeIterator, Iterator};
 use std::ops::{Index, IndexMut};
 
@@ -21,7 +23,7 @@ pub fn print_day(year: usize, day: usize, (part1, part2): (String, String)) {
     println!("part 2: {:}", part2);
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Grid<T> {
     pub dims: (usize, usize),
     pub array: Vec<T>,
@@ -76,22 +78,22 @@ pub struct GridRowIter<'a, T> {
     seen: usize,
 }
 
-impl<'a, T: std::fmt::Debug> Iterator for GridRowIter<'a, T> {
+impl<'a, T> Iterator for GridRowIter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.front == self.dims.1 * (self.row + 1) {
-            return None;
+            None
         } else {
             let v = &self.array[self.front];
             self.front += 1;
             self.seen += 1;
-            return Some(v);
+            Some(v)
         }
     }
 }
 
-impl<'a, T: std::fmt::Debug> DoubleEndedIterator for GridRowIter<'a, T> {
+impl<'a, T> DoubleEndedIterator for GridRowIter<'a, T> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if let Some(back) = self.back {
             let v = &self.array[back];
@@ -101,14 +103,14 @@ impl<'a, T: std::fmt::Debug> DoubleEndedIterator for GridRowIter<'a, T> {
                 None
             };
             self.seen += 1;
-            return Some(v);
+            Some(v)
         } else {
-            return None;
+            None
         }
     }
 }
 
-impl<'a, T: std::fmt::Debug> ExactSizeIterator for GridRowIter<'a, T> {
+impl<'a, T> ExactSizeIterator for GridRowIter<'a, T> {
     fn len(&self) -> usize {
         self.dims.1 - self.seen
     }
@@ -123,22 +125,22 @@ pub struct GridColIter<'a, T> {
     seen: usize,
 }
 
-impl<'a, T: std::fmt::Debug> Iterator for GridColIter<'a, T> {
+impl<'a, T> Iterator for GridColIter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.front >= self.dims.1 * self.dims.0 {
-            return None;
+            None
         } else {
             let v = &self.array[self.front];
             self.front += self.dims.1;
             self.seen += 1;
-            return Some(v);
+            Some(v)
         }
     }
 }
 
-impl<'a, T: std::fmt::Debug> DoubleEndedIterator for GridColIter<'a, T> {
+impl<'a, T> DoubleEndedIterator for GridColIter<'a, T> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if let Some(back) = self.back {
             let v = &self.array[back];
@@ -148,14 +150,14 @@ impl<'a, T: std::fmt::Debug> DoubleEndedIterator for GridColIter<'a, T> {
                 None
             };
             self.seen += 1;
-            return Some(v);
+            Some(v)
         } else {
-            return None;
+            None
         }
     }
 }
 
-impl<'a, T: std::fmt::Debug> ExactSizeIterator for GridColIter<'a, T> {
+impl<'a, T> ExactSizeIterator for GridColIter<'a, T> {
     fn len(&self) -> usize {
         self.dims.0 - self.seen
     }
@@ -174,5 +176,27 @@ impl<T> IndexMut<usize> for Grid<T> {
     fn index_mut(&mut self, row: usize) -> &mut [T] {
         let start = row * self.dims.1;
         &mut self.array[start..start + self.dims.1]
+    }
+}
+
+impl<T: Debug + Display> Display for Grid<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut str = String::new();
+        for i in 0..self.dims.0 {
+            str.push_str(&self.row(i).map(|c| format!("{} ", c)).collect::<String>());
+            str.push('\n');
+        }
+        write!(f, "{}", str)
+    }
+}
+
+impl<T: Debug> Debug for Grid<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut str = String::new();
+        for i in 0..self.dims.0 {
+            str.push_str(&self.row(i).map(|c| format!("{:?} ", c)).collect::<String>());
+            str.push('\n');
+        }
+        write!(f, "{}", str)
     }
 }
