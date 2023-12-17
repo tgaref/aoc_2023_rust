@@ -1,5 +1,6 @@
 use core::fmt;
 use std::fmt::{Debug, Display};
+use std::hash::{Hash, Hasher};
 use std::iter::{DoubleEndedIterator, ExactSizeIterator, Iterator};
 use std::ops::{Index, IndexMut};
 
@@ -183,7 +184,7 @@ impl<T: Debug + Display> Display for Grid<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut str = String::new();
         for i in 0..self.dims.0 {
-            str.push_str(&self.row(i).map(|c| format!("{} ", c)).collect::<String>());
+            str.push_str(&self.row(i).map(|c| format!("{}", c)).collect::<String>());
             str.push('\n');
         }
         write!(f, "{}", str)
@@ -198,5 +199,21 @@ impl<T: Debug> Debug for Grid<T> {
             str.push('\n');
         }
         write!(f, "{}", str)
+    }
+}
+
+impl<T: PartialEq> PartialEq for Grid<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.dims == other.dims && self.array == other.array
+    }
+}
+
+impl<T: Eq> Eq for Grid<T> {}
+
+impl<T: Hash> Hash for Grid<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for v in &self.array {
+            v.hash(state);
+        }
     }
 }
